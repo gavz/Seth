@@ -48,7 +48,7 @@ class RDPProxy(threading.Thread):
             except (ssl.SSLError, ssl.SSLEOFError) as e:
                 print("SSLError: %s" % str(e))
             except (ConnectionResetError, OSError) as e:
-                print("Connection lost")
+                print("Connection lost (%s)" % str(e))
                 if "creds" in self.vars:
                     stop_attack()
 
@@ -131,7 +131,8 @@ class RDPProxy(threading.Thread):
             )
             try:
                 self.rsock = ssl.wrap_socket(self.rsock, ciphers="RC4-SHA")
-            except ssl.SSLError:
+            except ssl.SSLError as e:
+                print("Not using RC4-SHA because of SSL Error:", str(e))
                 self.rsock = ssl.wrap_socket(self.rsock, ciphers=None)
         except ConnectionResetError:
             print("Connection lost")
